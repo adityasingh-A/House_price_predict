@@ -1,0 +1,12 @@
+25MCI10283,ww
+25mci10283,1
+Shivam,2
+Nishant,2
+Rohit,34
+Aditya,1234
+kumarrabinder,12345678
+Yash,123
+Shivam,14
+Sahib,123
+Shivam,1
+Aditya,Adity@30
