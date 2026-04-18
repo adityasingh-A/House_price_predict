@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>History — House Price Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;min-height:100vh;color:#fff;overflow-x:hidden;}
+
+/* BG */
+.bg{position:fixed;inset:0;z-index:0;
+  background:linear-gradient(135deg,rgba(10,8,30,.87)0%,rgba(40,30,80,.82)50%,rgba(20,20,50,.87)100%),
+  url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1600&q=80') center/cover no-repeat;
+  animation:bgPan 20s ease-in-out infinite alternate;}
+@keyframes bgPan{0%{background-position:center 30%}100%{background-position:center 70%}}
+.bg::after{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 80% 30%,rgba(100,60,200,.24)0%,transparent 55%),
+             radial-gradient(ellipse at 20% 70%,rgba(245,166,35,.14)0%,transparent 50%);
+  animation:glo 9s ease-in-out infinite alternate;}
+@keyframes glo{0%{opacity:.55}100%{opacity:1}}
+
+.particles{position:fixed;inset:0;z-index:1;pointer-events:none;}
+.particle{position:absolute;border-radius:50%;background:rgba(255,255,255,.18);animation:rise linear infinite;}
+@keyframes rise{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:.35}100%{transform:translateY(-50px) scale(1);opacity:0}}
+
+/* NAVBAR */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:10;padding:14px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(0,0,0,.22);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(255,255,255,.1);
+  animation:slideDown .5s ease both;}
+@keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.nav-brand{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;display:flex;align-items:center;gap:8px;}
+.nav-brand span{color:#f5a623;}
+.nav-links{display:flex;align-items:center;gap:6px;}
+.nav-link{padding:7px 16px;border-radius:20px;color:rgba(255,255,255,.7);text-decoration:none;font-size:.88rem;font-weight:500;transition:all .3s;}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.1);}
+.nav-link.logout{color:#f87171;}
+.nav-link.logout:hover{background:rgba(248,113,113,.12);}
+
+/* PAGE */
+.page{position:relative;z-index:2;min-height:100vh;padding:90px 20px 40px;display:flex;flex-direction:column;align-items:center;}
+
+/* HEADING */
+.heading{text-align:center;margin-bottom:28px;animation:cardIn .6s ease both;}
+@keyframes cardIn{from{opacity:0;transform:translateY(28px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.heading h2{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;}
+.heading h2 em{color:#f5a623;font-style:normal;}
+.heading p{font-size:.88rem;color:rgba(255,255,255,.55);margin-top:6px;}
+
+/* CHIPS */
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;animation:cardIn .5s ease .1s both;}
+.chip{background:rgba(255,255,255,.08);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.14);
+  border-radius:12px;padding:8px 16px;font-size:.8rem;color:rgba(255,255,255,.65);}
+.chip strong{color:#f5a623;font-family:'Playfair Display',serif;font-size:.95rem;}
+
+/* SEARCH */
+.toolbar{display:flex;gap:12px;width:100%;max-width:720px;margin-bottom:18px;flex-wrap:wrap;}
+.search-wrap{flex:1;min-width:180px;position:relative;}
+.search-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.38);pointer-events:none;}
+.search-inp{width:100%;padding:10px 13px 10px 40px;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.16);border-radius:12px;color:#fff;
+  font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:all .3s;}
+.search-inp::placeholder{color:rgba(255,255,255,.3);}
+.search-inp:focus{border-color:#f5a623;background:rgba(255,255,255,.1);box-shadow:0 0 0 3px rgba(245,166,35,.16);}
+
+.back-link{padding:10px 20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.17);
+  border-radius:12px;color:#fff;text-decoration:none;font-size:.85rem;font-weight:500;
+  backdrop-filter:blur(8px);transition:all .3s;white-space:nowrap;}
+.back-link:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.32);transform:translateY(-1px);}
+
+/* CARD */
+.card{width:100%;max-width:720px;
+  background:rgba(255,255,255,.09);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border:1px solid rgba(255,255,255,.18);border-radius:24px;
+  box-shadow:0 12px 40px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.12);
+  overflow:hidden;animation:cardIn .7s cubic-bezier(.34,1.56,.64,1) .2s both;}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{font-size:.7rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+  color:rgba(255,255,255,.42);padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.09);text-align:left;}
+tbody tr{animation:rowIn .4s ease both;}
+@keyframes rowIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+tbody td{padding:14px 18px;font-size:.88rem;color:rgba(255,255,255,.75);border-bottom:1px solid rgba(255,255,255,.05);transition:background .2s;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:rgba(255,255,255,.04);}
+
+.price-col{color:#f5a623!important;font-weight:600;font-family:'Playfair Display',serif;font-size:.95rem!important;}
+.user-col{color:rgba(255,255,255,.55)!important;font-size:.8rem!important;}
+.city-col{font-weight:500;}
+
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:500;}
+.badge-high{background:rgba(245,166,35,.15);color:#f5a623;border:1px solid rgba(245,166,35,.25);}
+.badge-med {background:rgba(96,165,250,.15);color:#60a5fa;border:1px solid rgba(96,165,250,.25);}
+.badge-low {background:rgba(148,163,184,.12);color:#94a3b8;border:1px solid rgba(148,163,184,.2);}
+
+/* EMPTY */
+.empty{padding:60px 20px;text-align:center;}
+.empty-icon{font-size:3.5rem;margin-bottom:14px;animation:pulse 3s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.empty h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:8px;}
+.empty p{color:rgba(255,255,255,.5);font-size:.88rem;margin-bottom:20px;}
+.btn-primary{display:inline-block;padding:11px 28px;background:linear-gradient(135deg,#f5a623,#e8742a);
+  border-radius:12px;color:#fff;text-decoration:none;font-size:.92rem;font-weight:600;
+  box-shadow:0 4px 16px rgba(245,166,35,.38);transition:all .3s;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(245,166,35,.55);}
+
+.no-result{padding:30px;text-align:center;color:rgba(255,255,255,.4);font-size:.88rem;}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="particles" id="pts"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-brand">🏠 Home<span>Lens</span></div>
+  <div class="nav-links">
+    <a href="/home"   class="nav-link">🔍 Predict</a>
+    <a href="/logout" class="nav-link logout">⏻ Logout</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="heading">
+    <h2>Prediction <em>History</em></h2>
+    <p>All your past house price predictions in one place</p>
+  </div>
+
+  {% if data %}
+  <!-- Summary chips -->
+  <div class="chips">
+    <div class="chip">Total Predictions: <strong>{{ data|length }}</strong></div>
+    <div class="chip">Data from: <strong>history.txt</strong></div>
+  </div>
+  {% endif %}
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-ico">🔍</span>
+      <input type="text" class="search-inp" id="searchInput" placeholder="Search city or user..."/>
+    </div>
+    <a href="/home" class="back-link">+ New Prediction</a>
+  </div>
+
+  <!-- Card -->
+  <div class="card">
+    {% if data %}
+    <div class="tbl-wrap">
+      <table id="histTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>User</th>
+            <th>Predicted Price</th>
+            <th>City</th>
+            <th>Location Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in data %}
+          {% set parts = item.strip().split(' -> ') %}
+          <tr style="animation-delay:{{ loop.index0 * 0.045 }}s;" class="hist-row"
+              data-search="{{ item.strip()|lower }}">
+            <td class="user-col">{{ loop.index }}</td>
+            <td class="user-col">
+              <span style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.2);
+                border-radius:20px;padding:3px 10px;font-size:.78rem;color:#f5a623;">
+                {{ parts[0] if parts|length > 0 else '—' }}
+              </span>
+            </td>
+            <td class="price-col">
+              {% if parts|length > 1 %}
+                ₹ {{ parts[1] }}
+              {% else %}—{% endif %}
+            </td>
+            <td class="city-col">
+              {% if parts|length > 2 %}{{ parts[2] }}{% else %}—{% endif %}
+            </td>
+            <td>
+              {% if parts|length > 2 %}
+                {% set city = parts[2]|lower %}
+                {% if city in ['delhi','mumbai','bangalore'] %}
+                  <span class="badge badge-high">High</span>
+                {% elif city in ['chandigarh','mohali','jaipur'] %}
+                  <span class="badge badge-med">Medium</span>
+                {% else %}
+                  <span class="badge badge-low">Low</span>
+                {% endif %}
+              {% else %}—{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="no-result" id="noResult" style="display:none;">No records match your search.</div>
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty">
+      <div class="empty-icon">🏠</div>
+      <h3>No Predictions Yet</h3>
+      <p>You haven't made any house price predictions.<br>Start by predicting on the home page.</p>
+      <a href="/home" class="btn-primary">Make First Prediction</a>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<script>
+/* Particles */
+(function(){
+  const c=document.getElementById('pts');
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');p.className='particle';
+    const s=Math.random()*5+2;
+    p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${Math.random()*14+9}s;animation-delay:${Math.random()*9}s;opacity:${Math.random()*.32+.08};`;
+    c.appendChild(p);
+  }
+})();
+
+/* Live search */
+const si=document.getElementById('searchInput');
+const nr=document.getElementById('noResult');
+if(si){
+  si.addEventListener('input',function(){
+    const q=this.value.toLowerCase();
+    const rows=document.querySelectorAll('.hist-row');
+    let vis=0;
+    rows.forEach(r=>{
+      const show=!q||r.dataset.search.includes(q);
+      r.style.display=show?'':'none';
+      if(show)vis++;
+    });
+    if(nr) nr.style.display=vis===0?'block':'none';
+  });
+}
+</script>
+</body>
+</html>

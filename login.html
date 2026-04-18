@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Login — House Price Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#fff;}
+
+.bg{position:fixed;inset:0;z-index:0;
+  background:linear-gradient(135deg,rgba(10,8,30,.88)0%,rgba(40,30,80,.82)50%,rgba(20,20,50,.88)100%),
+  url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=80') center/cover no-repeat;
+  animation:bgPan 18s ease-in-out infinite alternate;}
+@keyframes bgPan{0%{background-position:center 30%}100%{background-position:center 70%}}
+.bg::after{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 20% 60%,rgba(100,60,200,.28)0%,transparent 55%),
+             radial-gradient(ellipse at 80% 20%,rgba(245,166,35,.16)0%,transparent 50%);
+  animation:glo 8s ease-in-out infinite alternate;}
+@keyframes glo{0%{opacity:.6}100%{opacity:1}}
+
+.particles{position:fixed;inset:0;z-index:1;pointer-events:none;}
+.particle{position:absolute;border-radius:50%;background:rgba(255,255,255,.18);animation:rise linear infinite;}
+@keyframes rise{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:.4}100%{transform:translateY(-50px) scale(1);opacity:0}}
+
+.card{position:relative;z-index:2;width:360px;
+  background:rgba(255,255,255,.10);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border:1px solid rgba(255,255,255,.22);border-radius:26px;padding:42px 36px;
+  box-shadow:0 12px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.14);
+  animation:cardIn .7s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes cardIn{from{opacity:0;transform:translateY(36px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.brand{text-align:center;margin-bottom:30px;}
+.brand-icon{width:62px;height:62px;margin:0 auto 14px;background:linear-gradient(135deg,#f5a623,#e8742a);
+  border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;
+  box-shadow:0 4px 20px rgba(245,166,35,.45);animation:pulse 3s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 4px 20px rgba(245,166,35,.45)}50%{box-shadow:0 4px 36px rgba(245,166,35,.75)}}
+.brand h1{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;}
+.brand p{font-size:.83rem;color:rgba(255,255,255,.6);margin-top:4px;}
+
+.fg{margin-bottom:16px;}
+.lbl{display:block;font-size:.73rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:7px;}
+.iw{position:relative;}
+.ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:.95rem;color:rgba(255,255,255,.4);pointer-events:none;transition:color .3s;}
+.iw:focus-within .ico{color:#f5a623;}
+input[type=text],input[type=password]{width:100%;padding:11px 13px 11px 40px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:12px;
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:.93rem;outline:none;transition:all .3s;}
+input::placeholder{color:rgba(255,255,255,.32);}
+input:focus{border-color:#f5a623;background:rgba(255,255,255,.11);box-shadow:0 0 0 3px rgba(245,166,35,.18);}
+
+.btn{width:100%;padding:12px;margin-top:6px;background:linear-gradient(135deg,#f5a623,#e8742a);
+  border:none;border-radius:12px;color:#fff;font-family:'DM Sans',sans-serif;
+  font-size:.97rem;font-weight:600;cursor:pointer;
+  box-shadow:0 4px 16px rgba(245,166,35,.38);transition:all .3s;position:relative;overflow:hidden;}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.14),transparent);opacity:0;transition:opacity .3s;}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(245,166,35,.55);}
+.btn:hover::after{opacity:1;}
+.btn:active{transform:translateY(0);}
+
+.auth-link{text-align:center;margin-top:18px;font-size:.83rem;color:rgba(255,255,255,.55);}
+.auth-link a{color:#f5a623;text-decoration:none;font-weight:500;}
+.auth-link a:hover{text-decoration:underline;}
+
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="particles" id="pts"></div>
+
+<div class="card">
+  <div class="brand">
+    <div class="brand-icon">🏠</div>
+    <h1>Welcome Back</h1>
+    <p>Sign in to predict house prices</p>
+  </div>
+
+  <form action="/login" method="post" id="loginForm">
+    <div class="fg">
+      <label class="lbl">Username</label>
+      <div class="iw">
+        <span class="ico">👤</span>
+        <input type="text" name="username" placeholder="Enter username" required autofocus/>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="lbl">Password</label>
+      <div class="iw">
+        <span class="ico">🔒</span>
+        <input type="password" name="password" placeholder="Enter password" required/>
+      </div>
+    </div>
+    <button type="submit" class="btn" id="loginBtn">Login</button>
+  </form>
+
+  <div class="auth-link">New user? <a href="/signup">Create Account</a></div>
+</div>
+
+<script>
+(function(){
+  const c=document.getElementById('pts');
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');p.className='particle';
+    const s=Math.random()*5+2;
+    p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${Math.random()*14+9}s;animation-delay:${Math.random()*9}s;opacity:${Math.random()*.35+.1};`;
+    c.appendChild(p);
+  }
+})();
+document.getElementById('loginForm').addEventListener('submit',function(){
+  const b=document.getElementById('loginBtn');
+  b.innerHTML='<span class="spinner"></span>Signing in...';b.disabled=true;
+});
+</script>
+</body>
+</html>
